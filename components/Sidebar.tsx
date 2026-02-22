@@ -277,10 +277,13 @@ export default function Sidebar() {
                             : "hover:bg-gray-50 active:bg-gray-100"
                         )}
                       >
-                        {/* Group avatar */}
-                        <div className="relative flex-shrink-0 w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                          <UsersRound className="w-6 h-6 text-indigo-500" />
-                        </div>
+                
+{/* Group avatar — initials + colored ring to distinguish from DMs */}
+<div className="relative flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm ring-2 ring-indigo-100">
+  <span className="text-white text-sm font-bold tracking-wide">
+    {(convo.groupName ?? "G").split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)}
+  </span>
+</div>
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">

@@ -136,10 +136,12 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
 
         {/* Avatar */}
         <div className="relative flex-shrink-0">
-          {isGroup ? (
-            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
-              <UsersRound className="w-5 h-5 text-indigo-500" />
-            </div>
+         {isGroup ? (
+  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm">
+    <span className="text-white text-sm font-bold tracking-wide">
+      {(conversation.groupName ?? "G").split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)}
+    </span>
+  </div>
           ) : otherUser?.imageUrl ? (
             <Image src={otherUser.imageUrl} alt={otherUser.name} width={40} height={40} className="rounded-full object-cover" />
           ) : (
@@ -217,29 +219,43 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
           </div>
         ) : (
           <>
-            {messages.map((msg, idx) => {
-              const isOwn = msg.senderId === user?.id;
-              const prevMsg = messages[idx - 1];
-              const showAvatar = !isOwn && (!prevMsg || prevMsg.senderId !== msg.senderId);
+  {messages.map((msg, idx) => {
+  const isOwn = msg.senderId === user?.id;
+  const prevMsg = messages[idx - 1];
+  const showAvatar = !isOwn && (!prevMsg || prevMsg.senderId !== msg.senderId);
+  const senderInfo = isGroup ? userMap.get(msg.senderId) : otherUser;
 
-              // For group chats, look up sender info from userMap
-              const senderInfo = isGroup ? userMap.get(msg.senderId) : otherUser;
+  // Date separator logic
+  const msgDate = new Date(msg.createdAt).toDateString();
+  const prevDate = prevMsg ? new Date(prevMsg.createdAt).toDateString() : null;
+  const showDateSeparator = msgDate !== prevDate;
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  const dateLabel = msgDate === today ? "Today" : msgDate === yesterday ? "Yesterday" : new Date(msg.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 
-              return (
-                <MessageBubble
-                  key={msg._id}
-                  message={msg}
-                  isOwn={isOwn}
-                  showAvatar={showAvatar}
-                  senderImage={isOwn ? undefined : senderInfo?.imageUrl}
-                  senderName={isOwn ? undefined : senderInfo?.name}
-                  currentUserId={user?.id ?? ""}
-                  onDelete={() => deleteMessage({ messageId: msg._id, userId: user?.id ?? "" })}
-                  onReact={emoji => toggleReaction({ messageId: msg._id, userId: user?.id ?? "", emoji })}
-                  userNames={userNames}
-                />
-              );
-            })}
+  return (
+    <div key={msg._id}>
+      {showDateSeparator && (
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs text-gray-400 font-medium px-2">{dateLabel}</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+      )}
+      <MessageBubble
+        message={msg}
+        isOwn={isOwn}
+        showAvatar={showAvatar}
+        senderImage={isOwn ? undefined : senderInfo?.imageUrl}
+        senderName={isOwn ? undefined : senderInfo?.name}
+        currentUserId={user?.id ?? ""}
+        onDelete={() => deleteMessage({ messageId: msg._id, userId: user?.id ?? "" })}
+        onReact={emoji => toggleReaction({ messageId: msg._id, userId: user?.id ?? "", emoji })}
+        userNames={userNames}
+      />
+    </div>
+  );
+})}
             <TypingIndicator typingUsers={typingUsers ?? []} userMap={userMap} />
           </>
         )}
