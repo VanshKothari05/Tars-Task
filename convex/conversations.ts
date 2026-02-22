@@ -48,3 +48,19 @@ export const getConversation = query({
     return await ctx.db.get(args.conversationId);
   },
 });
+export const createGroupConversation = mutation({
+  args: {
+    currentUserId: v.string(),
+    memberIds: v.array(v.string()), // clerkIds of other members
+    groupName: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const participants = [args.currentUserId, ...args.memberIds];
+    return await ctx.db.insert("conversations", {
+      participants,
+      isGroup: true,
+      groupName: args.groupName,
+      lastMessageTime: Date.now(),
+    });
+  },
+});

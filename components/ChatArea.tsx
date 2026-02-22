@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown, UsersRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import MessageBubble from "./MessageBubble";
@@ -24,6 +24,7 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
   );
   const conversation = allConversations?.find(c => c._id === conversationId) ?? null;
   const conversationsLoaded = allConversations !== undefined;
+  const isGroup = conversation?.isGroup ?? false;
 
   const messages = useQuery(api.messages.getMessages, conversationId ? { conversationId } : "skip");
   const typingUsers = useQuery(
@@ -42,8 +43,9 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
     otherParticipantIds.length > 0 ? { clerkIds: otherParticipantIds } : "skip"
   );
   const otherUsers = (otherUsersRaw ?? []).filter((u): u is NonNullable<typeof u> => u != null);
-  const otherUser = otherUsers[0] ?? null;
+  const otherUser = otherUsers[0] ?? null; // used for DMs only
   const userMap = new Map(otherUsers.map(u => [u.clerkId, u]));
+
   // For reaction tooltips: clerkId → display name
   const userNames = new Map(otherUsers.map(u => [u.clerkId, u.name]));
   if (user) userNames.set(user.id, user.fullName ?? user.username ?? "You");
@@ -121,14 +123,9 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
   }
 
   return (
-    /*
-     * CRITICAL: h-full + flex flex-col + overflow-hidden
-     * This makes header and input FIXED, only messages scroll.
-     * Works on both desktop and mobile without input disappearing.
-     */
     <div className="h-full flex flex-col overflow-hidden bg-white">
 
-      {/* ── HEADER (flex-shrink-0 = never squishes) ── */}
+      {/* ── HEADER ── */}
       <div className="flex-shrink-0 flex items-center gap-3 px-4 py-3 border-b border-gray-100 bg-white shadow-sm">
         <button
           onClick={() => router.push("/chat")}
@@ -137,30 +134,44 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
           <ArrowLeft className="w-5 h-5" />
         </button>
 
+        {/* Avatar */}
         <div className="relative flex-shrink-0">
-          {otherUser?.imageUrl ? (
+          {isGroup ? (
+            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+              <UsersRound className="w-5 h-5 text-indigo-500" />
+            </div>
+          ) : otherUser?.imageUrl ? (
             <Image src={otherUser.imageUrl} alt={otherUser.name} width={40} height={40} className="rounded-full object-cover" />
           ) : (
             <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-base">
               {otherUser?.name?.[0]?.toUpperCase() ?? "?"}
             </div>
           )}
-          <OnlineIndicator isOnline={otherUser?.isOnline} />
+          {!isGroup && <OnlineIndicator isOnline={otherUser?.isOnline} />}
         </div>
 
+        {/* Name + subtitle */}
         <div className="flex-1 min-w-0">
           <h2 className="font-semibold text-gray-900 truncate">
-            {otherUser?.name ?? (otherUsersRaw === undefined ? "Loading..." : "Unknown User")}
+            {isGroup
+              ? (conversation.groupName ?? "Group Chat")
+              : (otherUser?.name ?? (otherUsersRaw === undefined ? "Loading..." : "Unknown User"))}
           </h2>
           <p className="text-xs mt-0.5">
-            {otherUser?.isOnline
-              ? <span className="text-green-500 font-medium">● Online</span>
-              : otherUser ? <span className="text-gray-400">● Offline</span> : null}
+            {isGroup ? (
+              <span className="text-gray-400">
+                {conversation.participants.length} members
+              </span>
+            ) : otherUser?.isOnline ? (
+              <span className="text-green-500 font-medium">● Online</span>
+            ) : otherUser ? (
+              <span className="text-gray-400">● Offline</span>
+            ) : null}
           </p>
         </div>
       </div>
 
-      {/* ── MESSAGES (flex-1 = takes all remaining space, scrolls internally) ── */}
+      {/* ── MESSAGES ── */}
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
@@ -178,7 +189,11 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center gap-4 py-8">
             <div className="bg-white rounded-full p-5 shadow-sm">
-              {otherUser?.imageUrl ? (
+              {isGroup ? (
+                <div className="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <UsersRound className="w-8 h-8 text-indigo-400" />
+                </div>
+              ) : otherUser?.imageUrl ? (
                 <Image src={otherUser.imageUrl} alt={otherUser.name} width={56} height={56} className="rounded-full object-cover" />
               ) : (
                 <div className="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold">
@@ -187,8 +202,17 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
               )}
             </div>
             <div>
-              <p className="text-gray-800 font-semibold text-lg">Say hello to {otherUser?.name ?? "them"}! 👋</p>
-              <p className="text-gray-400 text-sm mt-1">This is the very start of your conversation</p>
+              {isGroup ? (
+                <>
+                  <p className="text-gray-800 font-semibold text-lg">Welcome to {conversation.groupName ?? "the group"}! 👋</p>
+                  <p className="text-gray-400 text-sm mt-1">{conversation.participants.length} members · Say hello!</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-gray-800 font-semibold text-lg">Say hello to {otherUser?.name ?? "them"}! 👋</p>
+                  <p className="text-gray-400 text-sm mt-1">This is the very start of your conversation</p>
+                </>
+              )}
             </div>
           </div>
         ) : (
@@ -197,14 +221,18 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
               const isOwn = msg.senderId === user?.id;
               const prevMsg = messages[idx - 1];
               const showAvatar = !isOwn && (!prevMsg || prevMsg.senderId !== msg.senderId);
+
+              // For group chats, look up sender info from userMap
+              const senderInfo = isGroup ? userMap.get(msg.senderId) : otherUser;
+
               return (
                 <MessageBubble
                   key={msg._id}
                   message={msg}
                   isOwn={isOwn}
                   showAvatar={showAvatar}
-                  senderImage={isOwn ? undefined : otherUser?.imageUrl}
-                  senderName={isOwn ? undefined : otherUser?.name}
+                  senderImage={isOwn ? undefined : senderInfo?.imageUrl}
+                  senderName={isOwn ? undefined : senderInfo?.name}
                   currentUserId={user?.id ?? ""}
                   onDelete={() => deleteMessage({ messageId: msg._id, userId: user?.id ?? "" })}
                   onReact={emoji => toggleReaction({ messageId: msg._id, userId: user?.id ?? "", emoji })}
@@ -231,7 +259,7 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
         </div>
       )}
 
-      {/* ── INPUT (flex-shrink-0 = ALWAYS visible, never pushed off screen) ── */}
+      {/* ── INPUT ── */}
       <div className="flex-shrink-0 border-t border-gray-100">
         <MessageInput
           conversationId={conversationId}

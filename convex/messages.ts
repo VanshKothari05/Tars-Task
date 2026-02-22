@@ -12,6 +12,7 @@ export const sendMessage = mutation({
       conversationId: args.conversationId,
       senderId: args.senderId,
       content: args.content,
+       createdAt: Date.now(),
       isDeleted: false,
       reactions: [],
     });

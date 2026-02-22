@@ -5,6 +5,7 @@ export default defineSchema({
   users: defineTable({
     clerkId: v.string(),
     name: v.string(),
+  
     email: v.string(),
     imageUrl: v.string(),
     isOnline: v.boolean(),
@@ -25,6 +26,7 @@ export default defineSchema({
     conversationId: v.id("conversations"),
     senderId: v.string(), // clerkId
     content: v.string(),
+       createdAt: v.number(),
     isDeleted: v.boolean(),
     reactions: v.array(
       v.object({

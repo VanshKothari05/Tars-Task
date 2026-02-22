@@ -6,10 +6,15 @@ import ConvexClientProvider from "@/components/ConvexClientProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
+
 export const metadata: Metadata = {
-  title: "Tars Chat",
+   title: "Tars Chat",
   description: "Real-time messaging app",
-  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
