@@ -22,20 +22,18 @@ export default defineSchema({
   }).index("by_lastMessageTime", ["lastMessageTime"]),
 
   messages: defineTable({
-  conversationId: v.id("conversations"),
-  senderId: v.string(), // clerkId
-  content: v.string(),
-  createdAt: v.number(), // 🔥 required
-  isDeleted: v.boolean(),
-  reactions: v.array(
-    v.object({
-      userId: v.string(),
-      emoji: v.string(),
-    })
-  ),
-})
-  .index("by_conversation", ["conversationId"])
-  .index("by_conversation_createdAt", ["conversationId", "createdAt"]),
+    conversationId: v.id("conversations"),
+    senderId: v.string(), // clerkId
+    content: v.string(),
+    isDeleted: v.boolean(),
+    reactions: v.array(
+      v.object({
+        userId: v.string(),
+        emoji: v.string(),
+      })
+    ),
+  })
+    .index("by_conversationId", ["conversationId"]),
 
   typingIndicators: defineTable({
     conversationId: v.id("conversations"),

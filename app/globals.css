@@ -2,52 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-* {
-  box-sizing: border-box;
-}
-
+/* 
+ * MOBILE SCROLL FIX:
+ * Force html + body to exactly the visible viewport.
+ * 100dvh = "dynamic viewport height" — shrinks when mobile browser
+ * address bar is visible, so nothing ever scrolls outside the screen.
+ */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none; /* prevents pull-to-refresh / bounce scroll */
+  position: fixed;           /* anchors the page on iOS Safari */
+  width: 100%;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar — only scrollable containers get this */
 ::-webkit-scrollbar {
   width: 4px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
   background: #d1d5db;
   border-radius: 2px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
 
-/* Typing animation dots */
+/* Typing animation */
 @keyframes bounce {
   0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-4px); }
+  30%           { transform: translateY(-4px); }
 }
-
 .typing-dot:nth-child(1) { animation: bounce 1s infinite 0s; }
 .typing-dot:nth-child(2) { animation: bounce 1s infinite 0.2s; }
 .typing-dot:nth-child(3) { animation: bounce 1s infinite 0.4s; }
+
+/* Fade-in animation for new messages button */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.15s ease-out;
+}

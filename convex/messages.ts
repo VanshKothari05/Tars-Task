@@ -12,12 +12,11 @@ export const sendMessage = mutation({
       conversationId: args.conversationId,
       senderId: args.senderId,
       content: args.content,
-      createdAt: Date.now(),      // 🔥 REQUIRED
       isDeleted: false,
       reactions: [],
     });
 
-    // update last message time for sidebar
+    // Update conversation's lastMessageTime for sidebar ordering
     await ctx.db.patch(args.conversationId, {
       lastMessageTime: Date.now(),
     });
@@ -31,7 +30,7 @@ export const getMessages = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("messages")
-      .withIndex("by_conversation", (q) =>
+      .withIndex("by_conversationId", (q) =>
         q.eq("conversationId", args.conversationId)
       )
       .order("asc")
@@ -49,7 +48,8 @@ export const deleteMessage = mutation({
     if (!message || message.senderId !== args.userId) {
       throw new Error("Unauthorized");
     }
-    await ctx.db.patch(args.messageId, { isDeleted: true });
+    // Soft delete + wipe all reactions so they dont show on deleted messages
+    await ctx.db.patch(args.messageId, { isDeleted: true, reactions: [] });
   },
 });
 
@@ -101,7 +101,7 @@ export const getUnreadCount = query({
 
     const messages = await ctx.db
       .query("messages")
-      .withIndex("by_conversation", (q) =>
+      .withIndex("by_conversationId", (q) =>
         q.eq("conversationId", args.conversationId)
       )
       .collect();
@@ -149,7 +149,7 @@ export const getLastMessages = query({
       args.conversationIds.map(async (id) => {
         const messages = await ctx.db
           .query("messages")
-          .withIndex("by_conversation", (q) => q.eq("conversationId", id))
+          .withIndex("by_conversationId", (q) => q.eq("conversationId", id))
           .order("desc")
           .take(1);
         return messages[0] ?? null;
