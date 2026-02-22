@@ -25,10 +25,10 @@ export default function ChatArea({ conversationId }: { conversationId: Id<"conve
   const conversation = allConversations?.find(c => c._id === conversationId) ?? null;
   const conversationsLoaded = allConversations !== undefined;
 
-  const messages = useQuery(api.messages.getMessages, { conversationId });
+  const messages = useQuery(api.messages.getMessages, conversationId ? { conversationId } : "skip");
   const typingUsers = useQuery(
     api.typing.getTypingUsers,
-    user ? { conversationId, currentUserId: user.id } : "skip"
+    user && conversationId ? { conversationId, currentUserId: user.id } : "skip"
   );
 
   const markAsRead = useMutation(api.messages.markAsRead);
