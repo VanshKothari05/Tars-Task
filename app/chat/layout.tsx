@@ -40,28 +40,43 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
 
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center bg-gray-50" style={{ height: "100dvh" }}>
+      <div
+        className="flex items-center justify-center bg-gray-50"
+        style={{ height: "100dvh" }}
+      >
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden flex bg-white" style={{ height: "100dvh" }}>
-      {/* Sidebar: full width on mobile (when no convo), 320px on desktop */}
-      <div className={[
-        "flex-shrink-0 border-r border-gray-100 flex flex-col",
-        "w-full md:w-80",
-        hasConversation ? "hidden md:flex" : "flex",
-      ].join(" ")}>
+    /*
+     * KEY: style height 100dvh instead of h-screen (100vh).
+     * 100dvh = dynamic viewport — shrinks when mobile browser bar
+     * appears so content never overflows the visible screen.
+     */
+    <div
+      className="flex overflow-hidden bg-white"
+      style={{ height: "100dvh" }}
+    >
+      {/* Sidebar */}
+      <div
+        className={[
+          "flex-shrink-0 border-r border-gray-100 flex flex-col",
+          "w-full md:w-80",
+          hasConversation ? "hidden md:flex" : "flex",
+        ].join(" ")}
+      >
         <Sidebar />
       </div>
 
-      {/* Chat area: hidden on mobile when no convo selected */}
-      <div className={[
-        "flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden",
-        hasConversation ? "flex" : "hidden md:flex",
-      ].join(" ")}>
+      {/* Chat panel */}
+      <div
+        className={[
+          "flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden",
+          hasConversation ? "flex" : "hidden md:flex",
+        ].join(" ")}
+      >
         {children}
       </div>
     </div>

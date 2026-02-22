@@ -15,12 +15,9 @@ export const sendMessage = mutation({
       isDeleted: false,
       reactions: [],
     });
-
-    // Update conversation's lastMessageTime for sidebar ordering
     await ctx.db.patch(args.conversationId, {
       lastMessageTime: Date.now(),
     });
-
     return messageId;
   },
 });
@@ -48,8 +45,11 @@ export const deleteMessage = mutation({
     if (!message || message.senderId !== args.userId) {
       throw new Error("Unauthorized");
     }
-    // Soft delete + wipe all reactions so they dont show on deleted messages
-    await ctx.db.patch(args.messageId, { isDeleted: true, reactions: [] });
+    // ✅ Soft delete AND clear reactions in one patch
+    await ctx.db.patch(args.messageId, {
+      isDeleted: true,
+      reactions: [],
+    });
   },
 });
 
@@ -62,6 +62,8 @@ export const toggleReaction = mutation({
   handler: async (ctx, args) => {
     const message = await ctx.db.get(args.messageId);
     if (!message) throw new Error("Message not found");
+    // Don't allow reactions on deleted messages
+    if (message.isDeleted) return;
 
     const existingIndex = message.reactions.findIndex(
       (r) => r.userId === args.userId && r.emoji === args.emoji
@@ -69,10 +71,8 @@ export const toggleReaction = mutation({
 
     let newReactions;
     if (existingIndex >= 0) {
-      // Remove the reaction
       newReactions = message.reactions.filter((_, i) => i !== existingIndex);
     } else {
-      // Add reaction, removing any other emoji from same user first
       const filtered = message.reactions.filter(
         (r) => !(r.userId === args.userId && r.emoji === args.emoji)
       );
@@ -83,7 +83,6 @@ export const toggleReaction = mutation({
   },
 });
 
-// Count unread messages per conversation for a user
 export const getUnreadCount = query({
   args: {
     conversationId: v.id("conversations"),
@@ -96,26 +95,19 @@ export const getUnreadCount = query({
         q.eq("conversationId", args.conversationId).eq("userId", args.userId)
       )
       .unique();
-
     const lastReadTime = receipt?.lastReadTime ?? 0;
-
     const messages = await ctx.db
       .query("messages")
       .withIndex("by_conversationId", (q) =>
         q.eq("conversationId", args.conversationId)
       )
       .collect();
-
     return messages.filter(
-      (m) =>
-        m.senderId !== args.userId &&
-        m._creationTime > lastReadTime &&
-        !m.isDeleted
+      (m) => m.senderId !== args.userId && m._creationTime > lastReadTime && !m.isDeleted
     ).length;
   },
 });
 
-// Bulk unread counts for all conversations of a user
 export const getAllUnreadCounts = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
@@ -123,11 +115,8 @@ export const getAllUnreadCounts = query({
       .query("readReceipts")
       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .collect();
-
     const receiptMap = new Map(receipts.map((r) => [r.conversationId, r.lastReadTime]));
-
     const allMessages = await ctx.db.query("messages").collect();
-
     const counts: Record<string, number> = {};
     for (const msg of allMessages) {
       if (msg.senderId === args.userId || msg.isDeleted) continue;
@@ -141,7 +130,6 @@ export const getAllUnreadCounts = query({
   },
 });
 
-// Get last message for each conversation (for sidebar previews)
 export const getLastMessages = query({
   args: { conversationIds: v.array(v.id("conversations")) },
   handler: async (ctx, args) => {
@@ -171,7 +159,6 @@ export const markAsRead = mutation({
         q.eq("conversationId", args.conversationId).eq("userId", args.userId)
       )
       .unique();
-
     if (existing) {
       await ctx.db.patch(existing._id, { lastReadTime: Date.now() });
     } else {
