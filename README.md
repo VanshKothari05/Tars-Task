@@ -1,5 +1,7 @@
 # Tars Chat — Real-time Messaging App
+A full-stack real-time chat application built as part of the Tars Full Stack Engineer internship challenge.
 
+The goal was to design a clean, scalable messaging system with realtime updates, unread tracking, typing indicators, and presence detection.
 Built with **Next.js 15**, **TypeScript**, **Convex**, and **Clerk**.
 
 ## Features
@@ -162,4 +164,4 @@ typingIndicators — conversationId, userId, lastTyped
 readReceipts   — conversationId, userId, lastReadTime
 ```
 
-All tables have appropriate indexes for fast queries.
+Each table includes indexes on frequently queried fields (like conversationId and userId) to keep queries efficient.
