@@ -1,14 +1,13 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Get or create a 1-on-1 conversation between two users
 export const getOrCreateConversation = mutation({
   args: {
     currentUserId: v.string(),
     otherUserId: v.string(),
   },
   handler: async (ctx, args) => {
-    // Look for an existing DM conversation
+ 
     const conversations = await ctx.db.query("conversations").collect();
     const existing = conversations.find(
       (c) =>
@@ -28,7 +27,7 @@ export const getOrCreateConversation = mutation({
   },
 });
 
-// Get all conversations for a user, sorted by latest message
+
 export const getUserConversations = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
@@ -51,7 +50,7 @@ export const getConversation = query({
 export const createGroupConversation = mutation({
   args: {
     currentUserId: v.string(),
-    memberIds: v.array(v.string()), // clerkIds of other members
+    memberIds: v.array(v.string()), 
     groupName: v.string(),
   },
   handler: async (ctx, args) => {

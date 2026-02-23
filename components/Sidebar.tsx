@@ -119,13 +119,13 @@ export default function Sidebar() {
   return (
     <>
       <div className="flex flex-col h-full bg-white">
-        {/* Header */}
+      
         <div className="flex-shrink-0 px-4 pt-4 pb-3 border-b border-gray-100">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-xl font-bold text-indigo-600 tracking-tight">Tars Chat</h1>
             <div className="flex items-center gap-2">
-              {/* New Group button */}
-{/* New Group button */}
+            
+
 <button
   onClick={() => { setShowGroupModal(true); setQuery(""); }}
   className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-semibold transition-colors"
@@ -134,7 +134,7 @@ export default function Sidebar() {
   <Plus className="w-3.5 h-3.5" />
   Group
 </button>
-{/* Find people button */}
+{/* Find ppl */}
 <button
   onClick={() => { setShowUsers(v => !v); setQuery(""); }}
   className={cn(
@@ -163,7 +163,6 @@ export default function Sidebar() {
           </div>
         </div>
 
-        {/* Body */}
         <div className="flex-1 overflow-y-auto">
           {showUsers ? (
             <div>
@@ -263,7 +262,7 @@ export default function Sidebar() {
                   const unread = (unreadCounts ?? {})[convo._id as string] ?? 0;
                   const isActive = convo._id === activeId;
 
-                  // Group conversation
+                  
                   if (isGroup) {
                     const memberCount = convo.participants.length;
                     return (
@@ -277,8 +276,8 @@ export default function Sidebar() {
                             : "hover:bg-gray-50 active:bg-gray-100"
                         )}
                       >
-                
-{/* Group avatar — initials + colored ring to distinguish from DMs */}
+                    
+
 <div className="relative flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm ring-2 ring-indigo-100">
   <span className="text-white text-sm font-bold tracking-wide">
     {(convo.groupName ?? "G").split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2)}
@@ -378,11 +377,10 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* ── Group Creation Modal ── */}
       {showGroupModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col max-h-[90vh]">
-            {/* Modal header */}
+
             <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <UsersRound className="w-5 h-5 text-indigo-500" />
@@ -457,7 +455,7 @@ export default function Sidebar() {
               )}
             </div>
 
-            {/* Create button */}
+      
             <div className="px-5 py-4 border-t border-gray-100">
               <button
                 onClick={handleCreateGroup}

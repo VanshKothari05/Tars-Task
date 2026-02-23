@@ -34,7 +34,7 @@ export default function MessageInput({
     setContent(val);
     setSendError(null);
 
-    // Auto-resize textarea
+
     const el = textareaRef.current;
     if (el) {
       el.style.height = "auto";
@@ -60,7 +60,7 @@ export default function MessageInput({
     try {
       await onSend(trimmed);
       setContent("");
-      // Reset textarea height
+
       if (textareaRef.current) textareaRef.current.style.height = "auto";
     } catch {
       setSendError("Failed to send. Tap to retry.");
@@ -80,7 +80,7 @@ export default function MessageInput({
 
   return (
     <div className="bg-white px-3 py-3">
-      {/* Error banner */}
+ 
       {sendError && (
         <div className="mb-2 flex items-center gap-2 text-xs text-red-500 bg-red-50 rounded-lg px-3 py-1.5">
           <span>⚠️ {sendError}</span>

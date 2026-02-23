@@ -46,7 +46,7 @@ export const deleteMessage = mutation({
     if (!message || message.senderId !== args.userId) {
       throw new Error("Unauthorized");
     }
-    // ✅ Soft delete AND clear reactions in one patch
+    
     await ctx.db.patch(args.messageId, {
       isDeleted: true,
       reactions: [],
@@ -63,7 +63,7 @@ export const toggleReaction = mutation({
   handler: async (ctx, args) => {
     const message = await ctx.db.get(args.messageId);
     if (!message) throw new Error("Message not found");
-    // Don't allow reactions on deleted messages
+
     if (message.isDeleted) return;
 
     const existingIndex = message.reactions.findIndex(

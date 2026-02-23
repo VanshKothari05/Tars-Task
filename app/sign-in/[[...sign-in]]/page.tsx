@@ -8,6 +8,7 @@ export default function SignInPage() {
           <h1 className="text-3xl font-bold text-indigo-600">Tars Chat</h1>
           <p className="text-gray-500 mt-1">Real-time messaging for everyone</p>
         </div>
+        {/* Clerk signin component */}
         <SignIn fallbackRedirectUrl="/chat" />
       </div>
     </div>

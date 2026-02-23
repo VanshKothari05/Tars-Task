@@ -16,7 +16,7 @@ type Message = {
 
 const EMOJI_LIST = ["👍", "❤️", "😂", "😮", "😢"];
 
-// ── Who reacted tooltip ───────────────────────────────────────────────────────
+
 function ReactionTooltip({
   emoji,
   userIds,
@@ -33,7 +33,7 @@ function ReactionTooltip({
   );
 
   return (
-    // Rendered ABOVE the reaction badge, centered, non-interactive
+   
     <div className="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 z-[100] pointer-events-none">
       <div
         className="bg-gray-800 text-white rounded-2xl shadow-2xl overflow-hidden"
@@ -54,7 +54,7 @@ function ReactionTooltip({
           ))}
         </div>
       </div>
-      {/* Arrow pointing down */}
+
       <div className="flex justify-center">
         <div className="w-3 h-3 bg-gray-800 rotate-45 -mt-1.5" />
       </div>
@@ -62,7 +62,7 @@ function ReactionTooltip({
   );
 }
 
-// ── Floating action toolbar (appears above message on hover) ──────────────────
+
 function ActionBar({
   isOwn,
   onEmojiClick,
@@ -78,7 +78,7 @@ function ActionBar({
     <div
       className={cn(
         "absolute -top-9 flex items-center gap-1 bg-white rounded-xl shadow-lg border border-gray-100 px-1.5 py-1",
-        // Position toolbar on the correct side based on message owner
+        
         isOwn ? "right-0" : "left-0"
       )}
     >
@@ -106,7 +106,7 @@ function ActionBar({
   );
 }
 
-// ── Emoji picker panel ────────────────────────────────────────────────────────
+
 function EmojiPicker({
   isOwn,
   onSelect,
@@ -121,7 +121,7 @@ function EmojiPicker({
       ref={pickerRef}
       onClick={e => e.stopPropagation()}
       className={cn(
-        // Render BELOW the action bar so it never goes off-screen upward
+
         "absolute top-[-2px] z-[200] bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 flex gap-1",
         isOwn ? "right-0" : "left-0"
       )}
@@ -140,7 +140,7 @@ function EmojiPicker({
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+
 export default function MessageBubble({
   message, isOwn, showAvatar, senderImage, senderName,
   currentUserId, onDelete, onReact, userNames,
@@ -153,7 +153,7 @@ export default function MessageBubble({
   currentUserId: string;
   onDelete: () => void;
   onReact: (emoji: string) => void;
-  emojis?: string[]; // kept for backwards compat, we use the constant above
+  emojis?: string[]; 
   userNames?: Map<string, string>;
 }) {
   const [hovered, setHovered] = useState(false);
@@ -163,7 +163,7 @@ export default function MessageBubble({
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
   const namesMap = userNames ?? new Map<string, string>();
 
-  // Close picker on outside click
+ 
   useEffect(() => {
     if (!showPicker) return;
     function handle(e: MouseEvent) {
@@ -212,7 +212,7 @@ export default function MessageBubble({
         ) : null}
       </div>
 
-      {/* ── Content column ── */}
+      {/*Content column */}
       <div className={cn(
         "flex flex-col gap-1",
         "max-w-[72%] sm:max-w-[60%]",
@@ -225,9 +225,8 @@ export default function MessageBubble({
           </span>
         )}
 
-        {/* ── Bubble + hover toolbar wrapper ── */}
         <div className="relative">
-          {/* Floating action bar — appears above the bubble on hover */}
+
           {hovered && !message.isDeleted && (
             <ActionBar
               isOwn={isOwn}
@@ -237,7 +236,6 @@ export default function MessageBubble({
             />
           )}
 
-          {/* Emoji picker — appears below the action bar */}
           {showPicker && (
             <EmojiPicker
               isOwn={isOwn}
@@ -246,7 +244,7 @@ export default function MessageBubble({
             />
           )}
 
-          {/* The actual message bubble */}
+
           {message.isDeleted ? (
             <div className={cn(
               "px-4 py-2.5 rounded-2xl text-sm italic text-gray-400 border border-dashed",
@@ -268,7 +266,7 @@ export default function MessageBubble({
           )}
         </div>
 
-        {/* ── Reaction badges ── */}
+
         {hasReactions && (
           <div className={cn(
             "flex flex-wrap gap-1 px-1",
@@ -283,7 +281,7 @@ export default function MessageBubble({
                   onMouseEnter={() => setHoveredReaction(emoji)}
                   onMouseLeave={() => setHoveredReaction(null)}
                 >
-                  {/* Tooltip */}
+                  
                   {hoveredReaction === emoji && (
                     <ReactionTooltip
                       emoji={emoji}
@@ -293,7 +291,7 @@ export default function MessageBubble({
                     />
                   )}
 
-                  {/* Badge */}
+         
                   <button
                     onClick={() => onReact(emoji)}
                     className={cn(
@@ -312,7 +310,7 @@ export default function MessageBubble({
           </div>
         )}
 
-        {/* ── Timestamp ── */}
+   
         <span className={cn(
           "text-[10px] text-gray-400 px-1 select-none",
           isOwn ? "text-right" : "text-left"

@@ -24,7 +24,7 @@ export default defineSchema({
 
   messages: defineTable({
     conversationId: v.id("conversations"),
-    senderId: v.string(), // clerkId
+    senderId: v.string(), 
     content: v.string(),
        createdAt: v.number(),
     isDeleted: v.boolean(),
@@ -39,7 +39,7 @@ export default defineSchema({
 
   typingIndicators: defineTable({
     conversationId: v.id("conversations"),
-    userId: v.string(), // clerkId
+    userId: v.string(), 
     lastTyped: v.number(),
   })
     .index("by_conversationId", ["conversationId"])
@@ -47,7 +47,7 @@ export default defineSchema({
 
   readReceipts: defineTable({
     conversationId: v.id("conversations"),
-    userId: v.string(), // clerkId
+    userId: v.string(), 
     lastReadTime: v.number(),
   })
     .index("by_conversationId_userId", ["conversationId", "userId"])

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Called from Clerk webhook or on first login to sync user into Convex
+
 export const upsertUser = mutation({
   args: {
     clerkId: v.string(),

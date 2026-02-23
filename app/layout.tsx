@@ -27,7 +27,7 @@ export default function RootLayout({
       <body
         className={inter.className}
         style={{
-          height: "100dvh",   // ← dynamic viewport height — the key mobile fix
+          height: "100dvh",  
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",

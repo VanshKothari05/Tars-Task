@@ -7,30 +7,50 @@ import { useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 
-export default function ChatLayout({ children }: { children: React.ReactNode }) {
+export default function ChatLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { user, isLoaded } = useUser();
   const upsertUser = useMutation(api.users.upsertUser);
   const setOnlineStatus = useMutation(api.users.setOnlineStatus);
-  const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Useing browser-safe timeout 
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const params = useParams();
-  const hasConversation = !!params?.conversationId;
+  const hasConversation = Boolean(params?.conversationId);
 
   useEffect(() => {
     if (!user || !isLoaded) return;
+
+    // Checking if user exists in DB
     upsertUser({
       clerkId: user.id,
       name: user.fullName ?? user.username ?? "Anonymous",
       email: user.emailAddresses[0]?.emailAddress ?? "",
       imageUrl: user.imageUrl,
     });
+
+    // Mark user online
     setOnlineStatus({ clerkId: user.id, isOnline: true });
+
+    // Heartbeat every 30s to maintain presence
     heartbeatRef.current = setInterval(() => {
       setOnlineStatus({ clerkId: user.id, isOnline: true });
     }, 30000);
+
+    // Update status when tab visibility changes
     const handleVisibility = () => {
-      setOnlineStatus({ clerkId: user.id, isOnline: document.visibilityState !== "hidden" });
+      setOnlineStatus({
+        clerkId: user.id,
+        isOnline: document.visibilityState !== "hidden",
+      });
     };
+
     document.addEventListener("visibilitychange", handleVisibility);
+
     return () => {
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       document.removeEventListener("visibilitychange", handleVisibility);
@@ -50,15 +70,7 @@ export default function ChatLayout({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    /*
-     * KEY: style height 100dvh instead of h-screen (100vh).
-     * 100dvh = dynamic viewport — shrinks when mobile browser bar
-     * appears so content never overflows the visible screen.
-     */
-    <div
-      className="flex overflow-hidden bg-white"
-      style={{ height: "100dvh" }}
-    >
+    <div className="flex overflow-hidden bg-white" style={{ height: "100dvh" }}>
       {/* Sidebar */}
       <div
         className={[

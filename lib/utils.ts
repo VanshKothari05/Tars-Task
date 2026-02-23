@@ -6,12 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/**
- * Format message timestamp:
- * - Today → "2:34 PM"
- * - This year → "Feb 15, 2:34 PM"
- * - Older → "Feb 15 2023, 2:34 PM"
- */
+
 export function formatMessageTime(timestamp: number): string {
   const date = new Date(timestamp);
   if (isToday(date)) {

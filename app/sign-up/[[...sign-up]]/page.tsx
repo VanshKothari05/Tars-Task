@@ -8,6 +8,7 @@ export default function SignUpPage() {
           <h1 className="text-3xl font-bold text-indigo-600">Tars Chat</h1>
           <p className="text-gray-500 mt-1">Create your account to get started</p>
         </div>
+        {/* Clerk signup component */}
         <SignUp fallbackRedirectUrl="/chat" />
       </div>
     </div>
