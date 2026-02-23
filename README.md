@@ -6,19 +6,19 @@ Built with **Next.js 15**, **TypeScript**, **Convex**, and **Clerk**.
 
 ## Features
 
-- ✅ Authentication (Clerk — email + social login)
-- ✅ User list & search (find other registered users)
-- ✅ One-on-one direct messages (real-time via Convex)
-- ✅ Message timestamps (smart formatting)
-- ✅ Empty states (no conversations, no messages, no results)
-- ✅ Responsive layout (mobile sidebar → full-screen chat)
-- ✅ Online/Offline status (live green indicator)
-- ✅ Typing indicator ("Alex is typing...")
-- ✅ Unread message count badge (per conversation)
-- ✅ Smart auto-scroll ("↓ New messages" button)
-- ✅ Delete own messages (soft delete, shows "This message was deleted")
-- ✅ Message reactions (👍 ❤️ 😂 😮 😢)
-- ✅ Loading & error states (skeleton loaders, retry on send failure)
+- Authentication (Clerk — email + social login)
+-  User list & search (find other registered users)
+-  One-on-one direct messages (real-time via Convex)
+- Message timestamps (smart formatting)
+-  Empty states (no conversations, no messages, no results)
+-  Responsive layout (mobile sidebar → full-screen chat)
+-  Online/Offline status (live green indicator)
+-  Typing indicator ("Alex is typing...")
+-  Unread message count badge (per conversation)
+-  Smart auto-scroll ("↓ New messages" button)
+-  Delete own messages (soft delete, shows "This message was deleted")
+-  Message reactions (👍 ❤️ 😂 😮 😢)
+-  Loading & error states (skeleton loaders, retry on send failure)
 
 ## Tech Stack
 
